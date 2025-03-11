@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import Accordion from 'react-native-collapsible/Accordion';
 
 // Define type for IEBC election winners
 interface ElectionWinner {
@@ -28,6 +29,7 @@ interface Representative {
   location: string;
   nextMeeting: string;
   expertise: string[];
+  level: 'national' | 'county';
 }
 
 // Fallback mock data in case API fails
@@ -42,7 +44,8 @@ const MOCK_REPRESENTATIVES: Representative[] = [
     phone: '(+254) 711-222-333',
     location: 'Parliament Buildings, Nairobi',
     nextMeeting: 'April 5, 2025',
-    expertise: ['Constitutional Law', 'Women\'s Rights']
+    expertise: ['Constitutional Law', 'Women\'s Rights'],
+    level: 'national'
   },
   {
     id: '2',
@@ -54,7 +57,8 @@ const MOCK_REPRESENTATIVES: Representative[] = [
     phone: '(+254) 722-333-444',
     location: 'The Senate, Nairobi',
     nextMeeting: 'April 12, 2025',
-    expertise: ['Agriculture', 'Trade and Commerce']
+    expertise: ['Agriculture', 'Trade and Commerce'],
+    level: 'national'
   },
   {
     id: '3',
@@ -66,7 +70,8 @@ const MOCK_REPRESENTATIVES: Representative[] = [
     phone: '(+254) 733-444-555',
     location: 'Mombasa County Headquarters',
     nextMeeting: 'April 19, 2025',
-    expertise: ['Tourism', 'Infrastructure Development']
+    expertise: ['Tourism', 'Infrastructure Development'],
+    level: 'county'
   },
   {
     id: '4',
@@ -78,16 +83,22 @@ const MOCK_REPRESENTATIVES: Representative[] = [
     phone: '(+254) 744-555-666',
     location: 'Nakuru County Assembly',
     nextMeeting: 'April 26, 2025',
-    expertise: ['Youth Affairs', 'Sports and Culture']
+    expertise: ['Youth Affairs', 'Sports and Culture'],
+    level: 'county'
   }
 ];
 
 const path: string = "/representatives";
 
 export default function RepresentativesScreen() {
-  const [representatives, setRepresentatives] = React.useState<Representative[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [representatives, setRepresentatives] = useState<Representative[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeSections, setActiveSections] = useState<number[]>([0, 1]);
+  const router = useRouter();
+
+  const nationalReps = representatives.filter(rep => rep.level === 'national');
+  const countyReps = representatives.filter(rep => rep.level === 'county');
 
   React.useEffect(() => {
     fetchRepresentatives();
@@ -113,8 +124,6 @@ export default function RepresentativesScreen() {
     }
   };
 
-  const router = useRouter();
-
   const handleRepresentativePress = (representative: Representative) => {
     router.push({
       pathname: '/(tabs)/representative-details',
@@ -130,7 +139,7 @@ export default function RepresentativesScreen() {
     return { uri: url };
   };
 
-  const renderItem = ({ item }: { item: Representative }) => (
+  const renderRepresentative = (item: Representative) => (
     <TouchableOpacity 
       style={styles.card}
       onPress={() => handleRepresentativePress(item)}
@@ -155,28 +164,52 @@ export default function RepresentativesScreen() {
     </TouchableOpacity>
   );
 
+  const renderSectionContent = (section: { title: string, data: Representative[] }) => (
+    <View style={styles.sectionContent}>
+      {section.data.map(item => renderRepresentative(item))}
+    </View>
+  );
+
+  const renderSectionHeader = (section: { title: string, data: Representative[] }, index: number, isActive: boolean) => (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionHeaderText}>{section.title}</Text>
+      <Ionicons name={isActive ? "chevron-up" : "chevron-down"} size={24} color="#0066cc" />
+    </View>
+  );
+
+  const sections = [
+    { title: 'National Government', data: nationalReps },
+    { title: 'County Governments', data: countyReps }
+  ];
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0066cc" />
+        <Text>Loading representatives...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Ionicons name="alert-circle" size={40} color="red" />
+        <Text style={styles.errorText}>{error}</Text>
+        <Text>Using locally stored data instead</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.pageTitle}>Your Representatives</Text>
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066cc" />
-          <Text style={styles.loadingText}>Loading representatives...</Text>
-        </View>
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={40} color="red" />
-          <Text style={styles.errorText}>{error}</Text>
-          <Text>Using locally stored data instead</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={representatives}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.list}
-        />
-      )}
+      <Accordion
+        sections={sections}
+        activeSections={activeSections}
+        renderHeader={renderSectionHeader}
+        renderContent={renderSectionContent}
+        onChange={setActiveSections}
+      />
     </View>
   );
 }
@@ -187,14 +220,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     padding: 16
   },
-  pageTitle: {
+  headline: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
     color: '#333'
-  },
-  list: {
-    paddingBottom: 20
   },
   card: {
     flexDirection: 'row',
@@ -244,16 +274,26 @@ const styles = StyleSheet.create({
     color: '#0066cc',
     fontSize: 12
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+  sectionHeader: {
+    backgroundColor: '#f8f8f8',
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#eaeaea',
   },
-  loadingText: {
-    marginTop: 12,
-    color: '#666'
+  sectionHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
   },
-  errorContainer: {
+  sectionContent: {
+    marginBottom: 16,
+  },
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
