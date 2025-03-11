@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
+import { useState } from 'react';
+import MapView, { Marker } from 'react-native-maps';
 
 const MOCK_ISSUES = [
   {
@@ -8,6 +10,11 @@ const MOCK_ISSUES = [
     description: 'Multiple potholes on Main Street need urgent repair',
     status: 'pending',
     date: '2024-02-20',
+    location: {
+      latitude: -1.286389,
+      longitude: 36.817223,
+      description: 'Main Street'
+    }
   },
   {
     id: '2',
@@ -15,6 +22,11 @@ const MOCK_ISSUES = [
     description: 'Three street lights are not working on Oak Avenue',
     status: 'in_progress',
     date: '2024-02-19',
+    location: {
+      latitude: -1.286389,
+      longitude: 36.817223,
+      description: 'Oak Avenue'
+    }
   },
   {
     id: '3',
@@ -22,10 +34,17 @@ const MOCK_ISSUES = [
     description: 'Central Park requires maintenance and garbage removal',
     status: 'resolved',
     date: '2024-02-18',
+    location: {
+      latitude: -1.286389,
+      longitude: 36.817223,
+      description: 'Central Park'
+    }
   },
 ];
 
 export default function IssuesScreen() {
+  const [activeTab, setActiveTab] = useState('list');
+
   const renderStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -47,17 +66,69 @@ export default function IssuesScreen() {
       </View>
       <Text style={styles.issueDescription}>{item.description}</Text>
       <Text style={styles.issueDate}>{item.date}</Text>
+      {item.location && (
+        <Text style={styles.issueLocation}>{item.location.description}</Text>
+      )}
     </Pressable>
+  );
+
+  const renderListView = () => (
+    <FlatList
+      data={MOCK_ISSUES}
+      renderItem={renderItem}
+      keyExtractor={item => item.id}
+      contentContainerStyle={styles.listContainer}
+    />
+  );
+
+  const renderMapView = () => (
+    <View style={styles.mapContainer}>
+      <MapView 
+        style={styles.map}
+        initialRegion={{
+          latitude: -1.286389,
+          longitude: 36.817223,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+      >
+        {MOCK_ISSUES.map(issue => (
+          <Marker
+            key={issue.id}
+            coordinate={{
+              latitude: issue.location.latitude,
+              longitude: issue.location.longitude
+            }}
+            title={issue.title}
+            description={issue.description}
+            pinColor={
+              issue.status === 'pending' ? '#f59e0b' : 
+              issue.status === 'in_progress' ? '#3b82f6' : '#10b981'
+            }
+          />
+        ))}
+      </MapView>
+    </View>
   );
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={MOCK_ISSUES}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
+      <View style={styles.tabContainer}>
+        <Pressable 
+          style={[styles.tab, activeTab === 'list' && styles.activeTab]} 
+          onPress={() => setActiveTab('list')}
+        >
+          <Text style={[styles.tabText, activeTab === 'list' && styles.activeTabText]}>List</Text>
+        </Pressable>
+        <Pressable 
+          style={[styles.tab, activeTab === 'map' && styles.activeTab]} 
+          onPress={() => setActiveTab('map')}
+        >
+          <Text style={[styles.tabText, activeTab === 'map' && styles.activeTabText]}>Map</Text>
+        </Pressable>
+      </View>
+      
+      {activeTab === 'list' ? renderListView() : renderMapView()}
       <Pressable style={styles.addButton}>
         <Text style={styles.addButtonText}>Report New Issue</Text>
       </Pressable>
@@ -118,5 +189,47 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     color: '#ffffff',
     fontSize: 16,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#e2e8f0',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  activeTab: {
+    backgroundColor: '#0891b2',
+  },
+  tabText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#475569',
+  },
+  activeTabText: {
+    color: '#ffffff',
+    fontFamily: 'Inter-Bold',
+  },
+  mapContainer: {
+    flex: 1,
+    marginHorizontal: 16,
+    marginVertical: 16,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  issueLocation: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 4,
   },
 });
