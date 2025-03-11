@@ -4,7 +4,7 @@ import { Link, router } from 'expo-router';
 import { useAuth } from '@/contexts/auth';
 
 export default function SignInScreen() {
-  const [email, setEmail] = useState('');
+  const [nationalId, setNationalId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { signIn } = useAuth();
@@ -12,10 +12,10 @@ export default function SignInScreen() {
   const handleSignIn = async () => {
     try {
       setError('');
-      await signIn(email, password);
+      await signIn(nationalId, password);
       router.replace('/(tabs)');
     } catch (err) {
-      setError('Invalid email or password');
+      setError('Invalid national ID or password');
     }
   };
 
@@ -29,11 +29,10 @@ export default function SignInScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
+          placeholder="National ID"
+          value={nationalId}
+          onChangeText={setNationalId}
+          keyboardType="number-pad"
         />
 
         <TextInput

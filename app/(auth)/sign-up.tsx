@@ -1,62 +1,149 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuth } from '@/contexts/auth';
 
 export default function SignUpScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const { signUp } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    if (!name || !email || !idNumber || !password || !confirmPassword) {
+      setError('All fields are required');
+      return false;
+    }
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    
+    if (!/^\d{8}$/.test(idNumber)) {
+      setError('Please enter a valid ID number (8 digits)');
+      return false;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSignUp = async () => {
     try {
       setError('');
-      await signUp(email, password);
-      router.replace('/(tabs)');
-    } catch (err) {
-      setError('Unable to create account');
+      
+      if (!validateForm()) {
+        return;
+      }
+      
+      setLoading(true);
+      
+      await signUp({
+        name,
+        email,
+        idNumber,
+        password
+      });
+      
+      router.replace('/');
+    } catch (e) {
+      setError(e.message || 'Failed to sign up');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join our community</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Join Sauti to access government services</Text>
+          
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          
+          <Text style={styles.inputLabel}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your full name"
+            value={name}
+            onChangeText={setName}
+          />
+          
+          <Text style={styles.inputLabel}>ID Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your national ID number"
+            value={idNumber}
+            onChangeText={setIdNumber}
+            keyboardType="number-pad"
+            maxLength={8}
+          />
+          
+          <Text style={styles.inputLabel}>Email Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email address"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          
+          <Text style={styles.inputLabel}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Create a password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          
+          <Text style={styles.inputLabel}>Confirm Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm your password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Pressable 
+            style={[styles.button, loading && styles.buttonDisabled]} 
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
+          </Pressable>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <Pressable style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </Pressable>
-
-        <Link href="/sign-in" style={styles.link}>
-          <Text style={styles.linkText}>Already have an account? Sign in</Text>
-        </Link>
+          <View style={styles.linkContainer}>
+            <Link href="/sign-in" style={styles.link}>
+              <Text style={styles.linkText}>Already have an account? Sign in</Text>
+            </Link>
+            
+            <Link href="/forgot-password" style={styles.link}>
+              <Text style={styles.linkText}>Forgot your password?</Text>
+            </Link>
+          </View>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
@@ -91,6 +178,12 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     marginBottom: 16,
   },
+  inputLabel: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#475569',
+    marginBottom: 6,
+  },
   input: {
     fontFamily: 'Inter-Regular',
     height: 48,
@@ -110,10 +203,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  buttonDisabled: {
+    backgroundColor: '#94a3b8',
+  },
   buttonText: {
     fontFamily: 'Inter-Bold',
     color: '#ffffff',
     fontSize: 16,
+  },
+  linkContainer: {
+    alignItems: 'center',
+    gap: 10,
   },
   link: {
     alignItems: 'center',
