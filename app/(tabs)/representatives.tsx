@@ -307,6 +307,7 @@ export default function RepresentativesScreen() {
 
   const renderRepresentative = (item: Representative) => (
     <TouchableOpacity 
+      key={item.id}
       style={styles.card}
       onPress={() => handleRepresentativePress(item)}
     >
@@ -320,7 +321,7 @@ export default function RepresentativesScreen() {
         <Text style={styles.position}>{item.position} - {item.district}</Text>
         <View style={styles.expertiseContainer}>
           {item.expertise.map((skill, index) => (
-            <View key={index} style={styles.expertiseTag}>
+            <View key={`${item.id}-skill-${index}`} style={styles.expertiseTag}>
               <Text style={styles.expertiseText}>{skill}</Text>
             </View>
           ))}
@@ -361,7 +362,7 @@ export default function RepresentativesScreen() {
         <Text style={styles.categoryTitle}>County Governments</Text>
         {countySections.length > 0 ? (
           countySections.map((section, index) => (
-            <View key={section.countyId} style={styles.countyAccordion}>
+            <View key={`county-section-${section.countyId}`} style={styles.countyAccordion}>
               <Accordion
                 sections={[section]}
                 activeSections={countyActiveSections.includes(index) ? [0] : []}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router'; 
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/auth';
 
 export default function SignInScreen() {
@@ -8,12 +9,13 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { signIn } = useAuth();
+  const router = useRouter();
 
   const handleSignIn = async () => {
     try {
       setError('');
       await signIn(nationalId, password);
-      router.replace('/(tabs)');
+      replace('/(tabs)');
     } catch (err) {
       setError('Invalid national ID or password');
     }

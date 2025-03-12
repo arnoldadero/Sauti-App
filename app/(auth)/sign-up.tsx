@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/auth';
 
 export default function SignUpScreen() {

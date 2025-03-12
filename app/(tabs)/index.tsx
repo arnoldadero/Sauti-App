@@ -11,7 +11,7 @@ export default function HomeScreen() {
         />
         <View style={styles.heroContent}>
           <Text style={styles.heroTitle}>Welcome to Sautii</Text>
-          <Text style={styles.heroSubtitle}>Your voice matters in shaping our community</Text>
+          <Text style={styles.heroSubtitle}>Our Voice, Beyond the Noise</Text>
         </View>
       </View>
 
