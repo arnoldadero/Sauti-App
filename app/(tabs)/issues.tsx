@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { useState } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker } from '../../components/MapView';
 
 const MOCK_ISSUES = [
   {
@@ -231,5 +231,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748b',
     marginTop: 4,
+  },
+  webMapPlaceholder: {
+    flex: 1,
+    backgroundColor: '#f0f9ff',
+    borderRadius: 8,
+    margin: 16,
+    padding: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  webMapTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
+    color: '#0891b2',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  webMapText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: '#334155',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

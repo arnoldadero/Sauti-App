@@ -6,7 +6,7 @@ export default function HomeScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.hero}>
         <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop' }}
+          source={require('@/assets/images/logo.png')}
           style={styles.heroImage}
         />
         <View style={styles.heroContent}>
