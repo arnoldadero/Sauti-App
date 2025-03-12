@@ -1,0 +1,201 @@
+// List of Kenya's 47 counties
+const KENYA_COUNTIES = [
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", 
+  "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka-Nithi", "Embu", 
+  "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", 
+  "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia", "Uasin Gishu", 
+  "Elgeyo-Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado", 
+  "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", 
+  "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi"
+];
+
+// Updated Representative interface
+interface Representative {
+  id: string;
+  name: string;
+  position: string;
+  district: string;
+  photo: string;
+  email: string;
+  phone: string;
+  location: string;
+  nextMeeting: string;
+  expertise: string[];
+  level: 'national' | 'county';
+  countyId?: number; // ID of the county (1-47) for county representatives
+}
+
+// Fallback mock data with real Kenyan elected leaders and county IDs
+const MOCK_REPRESENTATIVES: Representative[] = [
+  // National Leaders
+  {
+    id: '1',
+    name: 'William Samoei Ruto',
+    position: 'President of Kenya',
+    district: 'Republic of Kenya',
+    photo: 'https://www.president.go.ke/wp-content/uploads/administration.jpg',
+    email: 'president@president.go.ke',
+    phone: '(+254) 20-2227436',
+    location: 'State House, Nairobi',
+    nextMeeting: 'April 15, 2025',
+    expertise: ['Economics', 'Agriculture', 'Bottom-up Economic Model'],
+    level: 'national'
+  },
+  {
+    id: '2',
+    name: 'Musalia Mudavadi',
+    position: 'Prime Cabinet Secretary',
+    district: 'National Government',
+    photo: 'https://www.president.go.ke/wp-content/uploads/2022/09/PCS.jpg',
+    email: 'cs@foreignaffairs.go.ke',
+    phone: '(+254) 722-333-444',
+    location: 'Harambee House, Nairobi',
+    nextMeeting: 'April 3, 2025',
+    expertise: ['Diplomacy', 'International Relations', 'Cabinet Affairs'],
+    level: 'national'
+  },
+  {
+    id: '4',
+    name: 'Moses Wetangula',
+    position: 'Speaker of the National Assembly',
+    district: 'National Assembly',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Moses_Wetangula.jpg',
+    email: 'speaker@parliament.go.ke',
+    phone: '(+254) 20-2221291',
+    location: 'Parliament Buildings, Nairobi',
+    nextMeeting: 'April 5, 2025',
+    expertise: ['Parliamentary Procedures', 'Constitutional Law', 'Legislative Affairs'],
+    level: 'national'
+  },
+  {
+    id: '5',
+    name: 'Amason Kingi',
+    position: 'Speaker of the Senate',
+    district: 'Senate',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Amason_Kingi.JPG/220px-Amason_Kingi.JPG',
+    email: 'speaker@senate.go.ke',
+    phone: '(+254) 20-2221291',
+    location: 'Parliament Buildings, Nairobi',
+    nextMeeting: 'April 7, 2025',
+    expertise: ['Constitutional Law', 'Devolution', 'County Affairs'],
+    level: 'national'
+  },
+  {
+    id: '7',
+    name: 'Esther Passaris',
+    position: 'Women Representative',
+    district: 'Nairobi County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Esther_Passaris.jpg/220px-Esther_Passaris.jpg',
+    email: 'esther.passaris@parliament.go.ke',
+    phone: '(+254) 722-111-222',
+    location: 'Parliament Buildings, Nairobi',
+    nextMeeting: 'April 4, 2025',
+    expertise: ['Women Rights', 'Gender Equality', 'Social Development'],
+    level: 'national'
+  },
+  
+  // County Leaders - Nairobi (County ID: 47)
+  {
+    id: '3',
+    name: 'Johnson Sakaja',
+    position: 'Governor',
+    district: 'Nairobi County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Sen._Johnson_Sakaja%2C_CBS.jpg/220px-Sen._Johnson_Sakaja%2C_CBS.jpg',
+    email: 'governor@nairobi.go.ke',
+    phone: '(+254) 20-2247277',
+    location: 'City Hall, Nairobi',
+    nextMeeting: 'March 30, 2025',
+    expertise: ['Urban Planning', 'Youth Affairs', 'County Administration'],
+    level: 'county',
+    countyId: 47
+  },
+  {
+    id: '8',
+    name: 'Robert Mbatia',
+    position: 'Member of County Assembly (MCA)',
+    district: 'Nairobi - Kariobangi South Ward',
+    photo: 'https://www.nairobiassembly.go.ke/ncca/docs/members/Robert_Mbatia.jpg',
+    email: 'robertmbatia@nairobiassembly.go.ke',
+    phone: '(+254) 722-987-654',
+    location: 'Nairobi County Assembly',
+    nextMeeting: 'March 29, 2025',
+    expertise: ['Urban Development', 'Budget & Appropriations', 'Public Service'],
+    level: 'county',
+    countyId: 47
+  },
+  
+  // County Leaders - Mombasa (County ID: 1)
+  {
+    id: '6',
+    name: 'Abdulswamad Shariff Nassir',
+    position: 'Governor',
+    district: 'Mombasa County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/f/f8/Abdulswamad_Nassir%2C_Governor_of_Mombasa_County_2022.jpg',
+    email: 'governor@mombasa.go.ke',
+    phone: '(+254) 41-2311531',
+    location: 'Mombasa County Headquarters',
+    nextMeeting: 'April 12, 2025',
+    expertise: ['Tourism', 'Maritime Affairs', 'Port Management'],
+    level: 'county',
+    countyId: 1
+  },
+  
+  // County Leaders - Nakuru (County ID: 32)
+  {
+    id: '9',
+    name: 'Susan Kihika',
+    position: 'Governor',
+    district: 'Nakuru County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Hon._Susan_Kihika.jpg/220px-Hon._Susan_Kihika.jpg',
+    email: 'governor@nakuru.go.ke',
+    phone: '(+254) 51-2216480',
+    location: 'Nakuru County Headquarters',
+    nextMeeting: 'April 19, 2025',
+    expertise: ['Agriculture', 'Tourism', 'County Legislation'],
+    level: 'county',
+    countyId: 32
+  },
+  
+  // County Leaders - Homa Bay (County ID: 43)
+  {
+    id: '10',
+    name: 'Gladys Wanga',
+    position: 'Governor',
+    district: 'Homa Bay County',
+    photo: 'https://www.the-star.co.ke/binrepository/480x360/0c0/0d0/none/124/OMEPQWWZ2ZB2DI2U5XKYKWRXFA/GLADYS-WANGA_2022_08_12.jpg',
+    email: 'governor@homabay.go.ke',
+    phone: '(+254) 59-2022522',
+    location: 'Homa Bay County Headquarters',
+    nextMeeting: 'April 22, 2025',
+    expertise: ['Healthcare', 'Women Empowerment', 'Rural Development'],
+    level: 'county',
+    countyId: 43
+  }
+];
+
+// Sample implementation of getCountyRepresentatives function
+const getCountyRepresentatives = (representatives) => {
+  const countyReps = representatives.filter(rep => rep.level === 'county');
+  
+  // Structure to organize by counties
+  const countySections = KENYA_COUNTIES.map((county, index) => {
+    const countyId = index + 1;
+    const countyLeaders = countyReps.filter(rep => rep.countyId === countyId);
+    
+    // Sort leaders within county (Governor first, then others)
+    countyLeaders.sort((a, b) => {
+      if (a.position.includes('Governor')) return -1;
+      if (b.position.includes('Governor')) return 1;
+      return 0;
+    });
+    
+    return {
+      title: `${county} County`,
+      data: countyLeaders,
+      countyId: countyId
+    };
+  });
+  
+  // Filter out counties with no representatives
+  return countySections.filter(county => county.data.length > 0);
+};

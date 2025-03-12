@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -30,99 +30,265 @@ interface Representative {
   nextMeeting: string;
   expertise: string[];
   level: 'national' | 'county';
+  countyId?: number;
 }
+
+// List of Kenya's 47 counties
+const KENYA_COUNTIES = [
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita Taveta", "Garissa", 
+  "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka-Nithi", "Embu", 
+  "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", 
+  "Kiambu", "Turkana", "West Pokot", "Samburu", "Trans Nzoia", "Uasin Gishu", 
+  "Elgeyo-Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado", 
+  "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", 
+  "Homa Bay", "Migori", "Kisii", "Nyamira", "Nairobi"
+];
 
 // Fallback mock data in case API fails
 const MOCK_REPRESENTATIVES: Representative[] = [
   {
     id: '1',
-    name: 'Alice Wambui',
-    position: 'Member of Parliament',
-    district: 'Nairobi West',
-    photo: 'https://i.pravatar.cc/150?img=4',
-    email: 'alice.wambui@parliament.go.ke',
-    phone: '(+254) 711-222-333',
-    location: 'Parliament Buildings, Nairobi',
-    nextMeeting: 'April 5, 2025',
-    expertise: ['Constitutional Law', 'Women\'s Rights'],
+    name: 'William Samoei Ruto',
+    position: 'President of Kenya',
+    district: 'Republic of Kenya',
+    photo: 'https://www.president.go.ke/wp-content/uploads/administration.jpg',
+    email: 'president@president.go.ke',
+    phone: '(+254) 20-2227436',
+    location: 'State House, Nairobi',
+    nextMeeting: 'April 15, 2025',
+    expertise: ['Economics', 'Agriculture', 'Bottom-up Economic Model'],
     level: 'national'
   },
   {
     id: '2',
-    name: 'James Otieno',
-    position: 'Senator',
-    district: 'Siaya County',
-    photo: 'https://i.pravatar.cc/150?img=5',
-    email: 'james.otieno@senate.go.ke',
+    name: 'Musalia Mudavadi',
+    position: 'Prime Cabinet Secretary',
+    district: 'National Government',
+    photo: 'https://www.president.go.ke/wp-content/uploads/2022/09/PCS.jpg',
+    email: 'cs@foreignaffairs.go.ke',
     phone: '(+254) 722-333-444',
-    location: 'The Senate, Nairobi',
-    nextMeeting: 'April 12, 2025',
-    expertise: ['Agriculture', 'Trade and Commerce'],
+    location: 'Harambee House, Nairobi',
+    nextMeeting: 'April 3, 2025',
+    expertise: ['Diplomacy', 'International Relations', 'Cabinet Affairs'],
     level: 'national'
   },
   {
     id: '3',
-    name: 'Fatuma Hassan',
+    name: 'Johnson Sakaja',
     position: 'Governor',
-    district: 'Mombasa County',
-    photo: 'https://i.pravatar.cc/150?img=6',
-    email: 'fatuma.hassan@mombasa.go.ke',
-    phone: '(+254) 733-444-555',
-    location: 'Mombasa County Headquarters',
-    nextMeeting: 'April 19, 2025',
-    expertise: ['Tourism', 'Infrastructure Development'],
-    level: 'county'
+    district: 'Nairobi County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Sen._Johnson_Sakaja%2C_CBS.jpg/220px-Sen._Johnson_Sakaja%2C_CBS.jpg',
+    email: 'governor@nairobi.go.ke',
+    phone: '(+254) 20-2247277',
+    location: 'City Hall, Nairobi',
+    nextMeeting: 'March 30, 2025',
+    expertise: ['Urban Planning', 'Youth Affairs', 'County Administration'],
+    level: 'county',
+    countyId: 47
   },
   {
     id: '4',
-    name: 'Samuel Kiprono',
+    name: 'Moses Wetangula',
+    position: 'Speaker of the National Assembly',
+    district: 'National Assembly',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Moses_Wetangula.jpg',
+    email: 'speaker@parliament.go.ke',
+    phone: '(+254) 20-2221291',
+    location: 'Parliament Buildings, Nairobi',
+    nextMeeting: 'April 5, 2025',
+    expertise: ['Parliamentary Procedures', 'Constitutional Law', 'Legislative Affairs'],
+    level: 'national'
+  },
+  {
+    id: '5',
+    name: 'Amason Kingi',
+    position: 'Speaker of the Senate',
+    district: 'Senate',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Amason_Kingi.JPG/220px-Amason_Kingi.JPG',
+    email: 'speaker@senate.go.ke',
+    phone: '(+254) 20-2221291',
+    location: 'Parliament Buildings, Nairobi',
+    nextMeeting: 'April 7, 2025',
+    expertise: ['Constitutional Law', 'Devolution', 'County Affairs'],
+    level: 'national'
+  },
+  {
+    id: '6',
+    name: 'Abdulswamad Shariff Nassir',
+    position: 'Governor',
+    district: 'Mombasa County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/f/f8/Abdulswamad_Nassir%2C_Governor_of_Mombasa_County_2022.jpg',
+    email: 'governor@mombasa.go.ke',
+    phone: '(+254) 41-2311531',
+    location: 'Mombasa County Headquarters',
+    nextMeeting: 'April 12, 2025',
+    expertise: ['Tourism', 'Maritime Affairs', 'Port Management'],
+    level: 'county',
+    countyId: 1
+  },
+  {
+    id: '7',
+    name: 'Esther Passaris',
+    position: 'Women Representative',
+    district: 'Nairobi County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Esther_Passaris.jpg/220px-Esther_Passaris.jpg',
+    email: 'esther.passaris@parliament.go.ke',
+    phone: '(+254) 722-111-222',
+    location: 'Parliament Buildings, Nairobi',
+    nextMeeting: 'April 4, 2025',
+    expertise: ['Women Rights', 'Gender Equality', 'Social Development'],
+    level: 'national'
+  },
+  {
+    id: '8',
+    name: 'Robert Mbatia',
     position: 'Member of County Assembly (MCA)',
-    district: 'Nakuru Town East Ward',
-    photo: 'https://i.pravatar.cc/150?img=7',
-    email: 'samuel.kiprono@nakuruassembly.go.ke',
-    phone: '(+254) 744-555-666',
-    location: 'Nakuru County Assembly',
-    nextMeeting: 'April 26, 2025',
-    expertise: ['Youth Affairs', 'Sports and Culture'],
-    level: 'county'
+    district: 'Nairobi - Kariobangi South Ward',
+    photo: 'https://www.nairobiassembly.go.ke/ncca/docs/members/Robert_Mbatia.jpg',
+    email: 'robertmbatia@nairobiassembly.go.ke',
+    phone: '(+254) 722-987-654',
+    location: 'Nairobi County Assembly',
+    nextMeeting: 'March 29, 2025',
+    expertise: ['Urban Development', 'Budget & Appropriations', 'Public Service'],
+    level: 'county',
+    countyId: 47
+  },
+  {
+    id: '9',
+    name: 'Susan Kihika',
+    position: 'Governor',
+    district: 'Nakuru County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Hon._Susan_Kihika.jpg/220px-Hon._Susan_Kihika.jpg',
+    email: 'governor@nakuru.go.ke',
+    phone: '(+254) 51-2216480',
+    location: 'Nakuru County Headquarters',
+    nextMeeting: 'April 19, 2025',
+    expertise: ['Agriculture', 'Tourism', 'County Legislation'],
+    level: 'county',
+    countyId: 32
+  },
+  {
+    id: '10',
+    name: 'Gladys Wanga',
+    position: 'Governor',
+    district: 'Homa Bay County',
+    photo: 'https://nation.africa/resource/image/4016530/landscape_ratio16x9/1160/652/ae3b2a4d0be9f5b9301f36e57cc9abe7/vM/govwanga.jpg',
+    email: 'governor@homabay.go.ke',
+    phone: '(+254) 59-2022522',
+    location: 'Homa Bay County Headquarters',
+    nextMeeting: 'April 22, 2025',
+    expertise: ['Healthcare', 'Women Empowerment', 'Rural Development'],
+    level: 'county',
+    countyId: 43
+  },
+  {
+    id: '11',
+    name: 'Anne Waiguru',
+    position: 'Governor',
+    district: 'Kirinyaga County',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Anne_Mumbi_Waiguru.jpg/220px-Anne_Mumbi_Waiguru.jpg',
+    email: 'governor@kirinyaga.go.ke',
+    phone: '(+254) 20-2380539',
+    location: 'Kirinyaga County Headquarters',
+    nextMeeting: 'April 14, 2025',
+    expertise: ['Public Administration', 'Women Leadership', 'Devolution'],
+    level: 'county',
+    countyId: 20
   }
 ];
 
 const path: string = "/representatives";
 
 export default function RepresentativesScreen() {
-  const [representatives, setRepresentatives] = useState<Representative[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with MOCK_REPRESENTATIVES to prevent continuous loading
+  const [representatives, setRepresentatives] = useState<Representative[]>(MOCK_REPRESENTATIVES);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeSections, setActiveSections] = useState<number[]>([0, 1]);
+  const [nationalActiveSections, setNationalActiveSections] = useState<number[]>([0]);
+  const [countyActiveSections, setCountyActiveSections] = useState<number[]>([]);
   const router = useRouter();
 
-  const nationalReps = representatives.filter(rep => rep.level === 'national');
-  const countyReps = representatives.filter(rep => rep.level === 'county');
-
-  React.useEffect(() => {
-    fetchRepresentatives();
+  // Only fetch from API if necessary in the future
+  useEffect(() => {
+    // Already initialized with mock data
+    // Only uncomment this when real API is ready
+    // fetchRepresentatives();
   }, []);
 
   const fetchRepresentatives = async () => {
     try {
+      setLoading(true);
       console.log('Attempting to fetch from API...');
+      
+      // For now just use mock data
+      // Uncomment below when API is ready
+      /*
       const response = await fetch('http://api.iebc.or.ke/elections/results/winners');
       if (!response.ok) {
-        console.warn(`API returned error status: ${response.status}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('API response:', data);
       setRepresentatives(data);
+      */
+      
+      setLoading(false);
     } catch (error) {
-      console.warn('API fetch failed, falling back to mock data:', error);
-      console.log('Mock data:', MOCK_REPRESENTATIVES);
-      setRepresentatives(MOCK_REPRESENTATIVES);
-    } finally {
+      console.warn('API fetch failed, using mock data');
+      setError('Failed to load data from API');
       setLoading(false);
     }
   };
+
+  // Function to group county representatives by county
+  const getCountyRepresentatives = () => {
+    const countyReps = representatives.filter(rep => rep.level === 'county');
+    
+    // Structure to organize by counties
+    const countySections = KENYA_COUNTIES.map((county, index) => {
+      const countyId = index + 1;
+      const countyLeaders = countyReps.filter(rep => rep.countyId === countyId);
+      
+      // Sort leaders within county (Governor first, then others)
+      countyLeaders.sort((a, b) => {
+        if (a.position.includes('Governor')) return -1;
+        if (b.position.includes('Governor')) return 1;
+        return 0;
+      });
+      
+      return {
+        title: `${county} County`,
+        data: countyLeaders,
+        countyId: countyId
+      };
+    });
+    
+    // Filter out counties with no representatives
+    return countySections.filter(county => county.data.length > 0);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0066cc" />
+        <Text>Loading representatives...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Ionicons name="alert-circle" size={40} color="red" />
+        <Text style={styles.errorText}>{error}</Text>
+        <Text>Using locally stored data instead</Text>
+      </View>
+    );
+  }
+
+  // Only compute these after loading is complete
+  const nationalReps = representatives.filter(rep => rep.level === 'national');
+  const nationalSection = [{ title: 'National Government', data: nationalReps }];
+  const countySections = getCountyRepresentatives();
 
   const handleRepresentativePress = (representative: Representative) => {
     router.push({
@@ -177,40 +343,55 @@ export default function RepresentativesScreen() {
     </View>
   );
 
-  const sections = [
-    { title: 'National Government', data: nationalReps },
-    { title: 'County Governments', data: countyReps }
-  ];
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0066cc" />
-        <Text>Loading representatives...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Ionicons name="alert-circle" size={40} color="red" />
-        <Text style={styles.errorText}>{error}</Text>
-        <Text>Using locally stored data instead</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <Accordion
-        sections={sections}
-        activeSections={activeSections}
-        renderHeader={renderSectionHeader}
-        renderContent={renderSectionContent}
-        onChange={setActiveSections}
-      />
-    </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.categoryContainer}>
+        <Text style={styles.categoryTitle}>National Government</Text>
+        <Accordion
+          sections={nationalSection}
+          activeSections={nationalActiveSections}
+          renderHeader={renderSectionHeader}
+          renderContent={renderSectionContent}
+          onChange={setNationalActiveSections}
+          sectionContainerStyle={styles.accordionSection}
+        />
+      </View>
+      
+      <View style={styles.categoryContainer}>
+        <Text style={styles.categoryTitle}>County Governments</Text>
+        {countySections.length > 0 ? (
+          countySections.map((section, index) => (
+            <View key={section.countyId} style={styles.countyAccordion}>
+              <Accordion
+                sections={[section]}
+                activeSections={countyActiveSections.includes(index) ? [0] : []}
+                renderHeader={renderSectionHeader}
+                renderContent={renderSectionContent}
+                onChange={(newSections) => {
+                  const newActiveSections = [...countyActiveSections];
+                  if (newSections.length > 0) {
+                    // Add this section to active sections if not already included
+                    if (!newActiveSections.includes(index)) {
+                      newActiveSections.push(index);
+                    }
+                  } else {
+                    // Remove this section from active sections
+                    const idx = newActiveSections.indexOf(index);
+                    if (idx !== -1) {
+                      newActiveSections.splice(idx, 1);
+                    }
+                  }
+                  setCountyActiveSections(newActiveSections);
+                }}
+                sectionContainerStyle={styles.accordionSection}
+              />
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No county representatives available</Text>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
@@ -305,5 +486,25 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     fontSize: 16,
     fontWeight: '500'
+  },
+  categoryContainer: {
+    marginBottom: 24
+  },
+  categoryTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333'
+  },
+  accordionSection: {
+    marginBottom: 16
+  },
+  countyAccordion: {
+    marginBottom: 16
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 16
   }
 });
