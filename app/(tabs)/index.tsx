@@ -31,12 +31,24 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Recent Updates</Text>
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>New Park Development</Text>
-          <Text style={styles.cardDescription}>Community feedback needed for the proposed Central Park renovation project.</Text>
+          <Text style={styles.cardTitle}>Cost of Living Crisis</Text>
+          <Text style={styles.cardDescription}>Rising prices for essential goods and high unemployment continue to be major concerns for many Kenyans in 2025.</Text>
         </View>
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Town Hall Meeting</Text>
-          <Text style={styles.cardDescription}>Join us this Friday for an open discussion about community initiatives.</Text>
+          <Text style={styles.cardTitle}>Civic Rights Concerns</Text>
+          <Text style={styles.cardDescription}>Human rights groups report increased cases of abductions and intimidation of government critics and activists.</Text>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Climate Emergency Response</Text>
+          <Text style={styles.cardDescription}>Communities in several counties dealing with effects of extreme weather, including drought in northern regions and flooding in lake areas.</Text>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Tax Reform Protests</Text>
+          <Text style={styles.cardDescription}>Public opposition continues against proposed tax increases that would affect basic goods including bread and mobile money transfers.</Text>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Anti-Corruption Campaign</Text>
+          <Text style={styles.cardDescription}>Grassroots movement gaining momentum as citizens demand greater transparency and accountability in government spending.</Text>
         </View>
       </View>
     </ScrollView>

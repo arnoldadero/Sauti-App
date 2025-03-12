@@ -6,38 +6,62 @@ import MapView, { Marker } from '../../components/MapView';
 const MOCK_ISSUES = [
   {
     id: '1',
-    title: 'Road Maintenance Required',
-    description: 'Multiple potholes on Main Street need urgent repair',
+    title: 'Water Shortage in Kitengela',
+    description: 'Residents have been without water for two weeks due to infrastructure failure',
     status: 'pending',
-    date: '2024-02-20',
+    date: '2025-03-10',
     location: {
-      latitude: -1.286389,
-      longitude: 36.817223,
-      description: 'Main Street'
+      latitude: -1.469730,
+      longitude: 36.960060,
+      description: 'Kitengela'
     }
   },
   {
     id: '2',
-    title: 'Street Light Malfunction',
-    description: 'Three street lights are not working on Oak Avenue',
+    title: 'Traffic Light Malfunction in CBD',
+    description: 'Traffic lights at Moi Avenue and Kenyatta Avenue intersection not working, causing congestion',
     status: 'in_progress',
-    date: '2024-02-19',
+    date: '2025-03-09',
     location: {
-      latitude: -1.286389,
-      longitude: 36.817223,
-      description: 'Oak Avenue'
+      latitude: -1.283329,
+      longitude: 36.822275,
+      description: 'Moi/Kenyatta Avenue Junction'
     }
   },
   {
     id: '3',
-    title: 'Park Cleanup',
-    description: 'Central Park requires maintenance and garbage removal',
-    status: 'resolved',
-    date: '2024-02-18',
+    title: 'Blocked Drainage in Eastleigh',
+    description: 'Blocked drainage system causing flooding on 1st Avenue during recent heavy rains',
+    status: 'pending',
+    date: '2025-03-08',
     location: {
-      latitude: -1.286389,
-      longitude: 36.817223,
-      description: 'Central Park'
+      latitude: -1.276670,
+      longitude: 36.852779,
+      description: 'Eastleigh 1st Avenue'
+    }
+  },
+  {
+    id: '4',
+    title: 'Power Outage in Westlands',
+    description: 'Frequent power outages affecting businesses and homes in the area for past three days',
+    status: 'in_progress',
+    date: '2025-03-07',
+    location: {
+      latitude: -1.263330,
+      longitude: 36.813610,
+      description: 'Westlands'
+    }
+  },
+  {
+    id: '5',
+    title: 'Garbage Collection in Umoja',
+    description: 'Uncollected garbage piling up in Umoja Inner Core area, posing health risks',
+    status: 'resolved',
+    date: '2025-03-05',
+    location: {
+      latitude: -1.293330,
+      longitude: 36.900002,
+      description: 'Umoja Inner Core'
     }
   },
 ];
@@ -88,8 +112,8 @@ export default function IssuesScreen() {
         initialRegion={{
           latitude: -1.286389,
           longitude: 36.817223,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15,
         }}
       >
         {MOCK_ISSUES.map(issue => (
