@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Accordion from 'react-native-collapsible/Accordion';
@@ -206,7 +206,7 @@ export default function RepresentativesScreen() {
   const [error, setError] = useState<string | null>(null);
   const [nationalActiveSections, setNationalActiveSections] = useState<number[]>([0]);
   const [countyActiveSections, setCountyActiveSections] = useState<number[]>([]);
-  const router = useRouter();
+  const navigation = useNavigation<any>();
 
   // Only fetch from API if necessary in the future
   useEffect(() => {
@@ -291,10 +291,7 @@ export default function RepresentativesScreen() {
   const countySections = getCountyRepresentatives();
 
   const handleRepresentativePress = (representative: Representative) => {
-    router.push({
-      pathname: '/(tabs)/representative-details',
-      params: { id: representative.id }
-    });
+    navigation.navigate('representative-details', { id: representative.id });
   };
 
   // Helper function to validate image URLs

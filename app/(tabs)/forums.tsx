@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, FlatList, Pressable, Image, ScrollView, ViewSty
 import { MessageCircle, ThumbsUp, Share2, ChevronDown, ChevronUp } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack } from 'expo-router/stack';
 
 // Mock data for National Forums
 const NATIONAL_FORUMS = [

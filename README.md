@@ -59,10 +59,25 @@ npm run build:web
 └── types.d.ts        # TypeScript type definitions
 ```
 
+## Application Structure
+
+The application is organized under the `app` directory as follows:
+
+- **(auth):** Contains authentication related screens such as sign-up and sign-in.
+- **(tabs):** Hosts primary interface pages including forums and representatives.
+- **Other files:
+  - `+not-found.tsx`: Custom 404 page handling.
+  - `_layout.tsx`: Layout configuration for the app.
+  - `navigation.ts`: Manages the app's navigation structure.
+  - `representative-details.tsx`: Provides detailed information about representatives.
+  - `representatives.tsx`: Summarizes representative data.
+
+All interactive elements use the custom `KenyanButton` component to provide a consistent Kenyan flag styled UI.
+
 ## Dependencies
 - Core: React Native 0.76, Expo SDK 52
 - Navigation: @react-navigation
-- UI: @expo/vector-icons, lucide-react-native
+- UI: @expo/vector-icons, lucide-react-native, KenyanButton
 - State: @supabase/supabase-js
 - Utilities: axios, ethers, cheerio
 
