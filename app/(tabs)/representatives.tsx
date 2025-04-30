@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
@@ -18,7 +18,7 @@ interface ElectionWinner {
 }
 
 // Transform to match current UI structure
-interface Representative {
+export interface Representative {
   id: string;
   name: string;
   position: string;
@@ -45,7 +45,7 @@ const KENYA_COUNTIES = [
 ];
 
 // Fallback mock data in case API fails
-const MOCK_REPRESENTATIVES: Representative[] = [
+export const MOCK_REPRESENTATIVES: Representative[] = [
   {
     id: '1',
     name: 'William Samoei Ruto',

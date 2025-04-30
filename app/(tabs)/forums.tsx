@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, FlatList, Pressable, Image, ScrollView, ViewStyle, TextStyle, StyleProp } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image, ScrollView, ViewStyle, TextStyle, StyleProp } from 'react-native';
 import { MessageCircle, ThumbsUp, Share2, ChevronDown, ChevronUp } from 'lucide-react-native';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router/stack';
 

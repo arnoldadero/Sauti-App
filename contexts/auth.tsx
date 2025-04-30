@@ -57,16 +57,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (userData: UserData) => {
     const { email, password, name, idNumber } = userData;
-    const { error } = await supabase.auth.signUp({ 
-      email, 
+    // Cast to any to bypass TS type check, as additional metadata is not declared in the current type
+    const { error } = await supabase.auth.signUp({
+      email,
       password,
       options: {
-        data: {
-          name,
-          id_number: idNumber
-        }
+        data: { name, id_number: idNumber }
       }
-    });
+    } as any);
     if (error) throw error;
   };
 

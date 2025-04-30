@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
 import Link from 'expo-router/link';
 import { useAuth } from '@/contexts/auth';
-import { useNavigation, StackActions } from '@react-navigation/native';
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
@@ -13,7 +12,6 @@ export default function SignUpScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
 
   const validateForm = () => {
     if (!name || !email || !idNumber || !password || !confirmPassword) {
@@ -55,10 +53,8 @@ export default function SignUpScreen() {
         idNumber,
         password
       });
-      
-      navigation.dispatch(StackActions.replace('(tabs)', {}));
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign up');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to sign up');
     } finally {
       setLoading(false);
     }
